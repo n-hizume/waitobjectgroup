@@ -16,6 +16,16 @@ func main() {
 		-> waitで, Goで作ったものだけを受けつけるため
 		キャンセルが効くようにcontextを受け取る
 		hoge1は ch or fun or id
+
+		todo:
+		wog.Go自体を並列実行した場合
+		waitAllでもれてたり？
+		途中状態とる？
+			プログレスバー表示ライブラリ 100%を定義, Goの引数に与える
+				ex
+				wog.Go(n, func(pbar) { ...})
+				pvar.inc()
+
 	*/
 	hoge1 := wog.Go(func() {
 		fmt.Println("start hoge1")
