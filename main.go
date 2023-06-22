@@ -12,11 +12,6 @@ func main() {
 	var wog waitobjectgroup.WaitObjectGroup
 
 	/*
-		他では作れないchを作る ex. 非公開objのch
-		-> waitで, Goで作ったものだけを受けつけるため
-		キャンセルが効くようにcontextを受け取る
-		hoge1は ch or fun or id
-
 		todo:
 		wog.Go自体を並列実行した場合
 		waitAllでもれてたり？
