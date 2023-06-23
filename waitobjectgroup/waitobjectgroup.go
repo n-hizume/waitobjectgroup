@@ -45,6 +45,7 @@ func (wog *WaitObjectGroup) Go(f func()) WaitObjectID {
 			delete(wog.chMap, id)
 			if wog.cancel != nil {
 				if p := recover(); p != nil {
+					fmt.Printf("panic was caused: %v\n", p)
 					wog.cancel(fmt.Errorf("panic was caused: %v", p))
 				}
 			}
