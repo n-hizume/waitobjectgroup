@@ -7,9 +7,14 @@ import (
 // idの型をwrap
 type WaitObjectID xid.ID
 
+type WaitObject struct {
+	ch chan struct{}
+	// p  any
+}
+
 // idをkeyとしてchを保持, userには渡さない
 type WaitObjectGroup struct {
-	chMap map[WaitObjectID](chan struct{})
+	chMap map[WaitObjectID](WaitObject)
 }
 
 // goroutineの実行と、chリスト(≒groutineリスト)への登録
@@ -18,17 +23,17 @@ type WaitObjectGroup struct {
 func (wog *WaitObjectGroup) Go(f func()) WaitObjectID {
 
 	if len(wog.chMap) == 0 {
-		wog.chMap = make(map[WaitObjectID](chan struct{}))
+		wog.chMap = make(map[WaitObjectID](WaitObject))
 	}
 
 	id := WaitObjectID(xid.New())
 	done := make(chan struct{})
-	wog.chMap[id] = done
+	// wog.chMap[id] = WaitObject{done, nil}
+	wog.chMap[id] = WaitObject{done}
 
 	go func() {
 		f()
 		close(done)
-		delete(wog.chMap, id)
 	}()
 
 	return id
@@ -37,10 +42,10 @@ func (wog *WaitObjectGroup) Go(f func()) WaitObjectID {
 // 引数で受け取ったchに対応するgroutineが全て終わるまで待機
 func (wog *WaitObjectGroup) Wait(idList ...WaitObjectID) {
 	for _, id := range idList {
-		//closeとdelete(id)の時差やwaitは呼ばれるまでの時差を考慮
-		ch, found := wog.chMap[id]
+		wo, found := wog.chMap[id]
 		if found {
-			<-ch
+			<-wo.ch
+			delete(wog.chMap, id)
 		}
 	}
 }
