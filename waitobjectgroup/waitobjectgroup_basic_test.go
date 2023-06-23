@@ -1,6 +1,7 @@
 package waitobjectgroup
 
 import (
+	"context"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -23,7 +24,7 @@ func assertEqual(t *testing.T, real uint32, ideal uint32) {
 Wait関数のテスト
 */
 func TestWait(t *testing.T) {
-	var wog WaitObjectGroup
+	wog, _ := CreateGroup(context.TODO())
 
 	var count uint32
 
@@ -44,7 +45,7 @@ Wait関数のテスト
 とっくにcloseされたものをwaitしても問題ないかテスト
 */
 func TestWait2(t *testing.T) {
-	var wog WaitObjectGroup
+	wog, _ := CreateGroup(context.TODO())
 
 	var count uint32
 
@@ -64,7 +65,7 @@ func TestWait2(t *testing.T) {
 WaitAllのテスト
 */
 func TestWaitAll(t *testing.T) {
-	var wog WaitObjectGroup
+	wog, _ := CreateGroup(context.TODO())
 
 	var count uint32
 
@@ -85,7 +86,7 @@ WaitAllのテスト
 とっくにcloseされたものをwaitAllしても問題ないかテスト
 */
 func TestWaitAll2(t *testing.T) {
-	var wog WaitObjectGroup
+	wog, _ := CreateGroup(context.TODO())
 
 	var count uint32
 

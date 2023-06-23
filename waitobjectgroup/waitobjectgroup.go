@@ -1,6 +1,9 @@
 package waitobjectgroup
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/rs/xid"
 )
 
@@ -14,14 +17,19 @@ type WaitObject struct {
 
 // idをkeyとしてchを保持, userには渡さない
 type WaitObjectGroup struct {
-	chMap map[WaitObjectID](WaitObject)
+	chMap  map[WaitObjectID](WaitObject)
+	cancel func(error)
+}
+
+func CreateGroup(ctx context.Context) (*WaitObjectGroup, context.Context) {
+	ctx, cancel := context.WithCancelCause(ctx)
+	return &WaitObjectGroup{cancel: cancel}, ctx
 }
 
 // goroutineの実行と、chリスト(≒groutineリスト)への登録
 // closeしたらidをdelete
 // ユーザのch操作は許容しないためidのみ返す
 func (wog *WaitObjectGroup) Go(f func()) WaitObjectID {
-
 	if len(wog.chMap) == 0 {
 		wog.chMap = make(map[WaitObjectID](WaitObject))
 	}
@@ -32,8 +40,16 @@ func (wog *WaitObjectGroup) Go(f func()) WaitObjectID {
 	wog.chMap[id] = WaitObject{done}
 
 	go func() {
+		defer func() {
+			close(done)
+			delete(wog.chMap, id)
+			if wog.cancel != nil {
+				if p := recover(); p != nil {
+					wog.cancel(fmt.Errorf("panic was caused: %v", p))
+				}
+			}
+		}()
 		f()
-		close(done)
 	}()
 
 	return id
@@ -45,7 +61,6 @@ func (wog *WaitObjectGroup) Wait(idList ...WaitObjectID) {
 		wo, found := wog.chMap[id]
 		if found {
 			<-wo.ch
-			delete(wog.chMap, id)
 		}
 	}
 }

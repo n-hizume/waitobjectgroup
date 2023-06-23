@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -8,50 +9,54 @@ import (
 )
 
 func main() {
-	// contextをとってcancelできるようにする
+	// sample1()
+	sample2()
+}
+
+func sample1() {
 	var wog waitobjectgroup.WaitObjectGroup
 
-	/*
-		todo:
-		wog.Go自体を並列実行した場合
-		waitAllでもれてたり？
-		途中状態とる？
-			プログレスバー表示ライブラリ 100%を定義, Goの引数に与える
-				ex
-				wog.Go(n, func(pbar) { ...})
-				pvar.inc()
+	f := func(i int) func() {
+		return func() {
+			fmt.Printf("start: %v\n", i)
+			time.Sleep(time.Duration(i*100) * time.Millisecond)
+			fmt.Printf("end: %v\n", i)
+		}
+	}
 
-	*/
-	hoge1 := wog.Go(func() {
-		fmt.Println("start hoge1")
-		time.Sleep(1 * time.Second)
-		fmt.Println("end hoge1")
-	})
-	hoge2 := wog.Go(func() {
-		fmt.Println("start hoge2")
-		time.Sleep(2 * time.Second)
-		fmt.Println("end hoge2")
-	})
-	wog.Go(func() {
-		fmt.Println("start hoge3")
-		time.Sleep(3 * time.Second)
-		fmt.Println("end hoge3")
-	})
-	hoge4 := wog.Go(func() {
-		fmt.Println("start hoge4")
-		time.Sleep(4 * time.Second)
-		fmt.Println("end hoge4")
-	})
-	wog.Go(func() {
-		fmt.Println("start hoge5")
-		time.Sleep(5 * time.Second)
-		fmt.Println("end hoge5")
-	})
+	hoge1 := wog.Go(f(1))
+	hoge2 := wog.Go(f(2))
+	wog.Go(f(3))
+	hoge4 := wog.Go(f(4))
+	wog.Go(f(5))
 
 	wog.Wait(hoge1)
 	fmt.Println("Wait1 Finished")
 	wog.Wait(hoge4, hoge2)
-	fmt.Println("Wait2 Finished")
+	fmt.Println("Wait2&4 Finished")
 	wog.WaitAll()
 	fmt.Println("WaitAll Finished")
+}
+
+func sample2() {
+	wog, ctx := waitobjectgroup.CreateGroup(context.TODO())
+
+	wog.Go(func() {
+		for {
+			select {
+			case <-ctx.Done():
+				fmt.Println("context Cancel")
+				return
+			case <-time.After(100 * time.Millisecond):
+				fmt.Println("Wait...")
+			}
+		}
+	})
+
+	wog.Go(func() {
+		time.Sleep(400 * time.Millisecond)
+		panic("hogePanic")
+	})
+
+	wog.WaitAll()
 }
