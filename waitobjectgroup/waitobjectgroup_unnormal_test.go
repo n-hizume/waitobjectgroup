@@ -9,8 +9,7 @@ import (
 
 /*
 wog.Go自体をgoroutineで実行
-WaitAllの時にはまだGoが登録されていないのでスルーされるが、やむなし？
--> todo: 同時的なmapへの書き込みエラーがたまに起きる
+WaitAllの時にはまだGoが登録されていないのでスルーされるが、やむなし
 */
 func TestWaitWithGoroutine(t *testing.T) {
 	wog, _ := CreateGroup(context.TODO())

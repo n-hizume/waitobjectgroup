@@ -3,6 +3,7 @@ package waitobjectgroup
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/rs/xid"
 )
@@ -19,6 +20,7 @@ type WaitObject struct {
 type WaitObjectGroup struct {
 	chMap  map[WaitObjectID](WaitObject)
 	cancel func(error)
+	mu     sync.Mutex
 }
 
 func CreateGroup(ctx context.Context) (*WaitObjectGroup, context.Context) {
@@ -30,19 +32,23 @@ func CreateGroup(ctx context.Context) (*WaitObjectGroup, context.Context) {
 // closeしたらidをdelete
 // ユーザのch操作は許容しないためidのみ返す
 func (wog *WaitObjectGroup) Go(f func()) WaitObjectID {
-	if len(wog.chMap) == 0 {
-		wog.chMap = make(map[WaitObjectID](WaitObject))
-	}
 
 	id := WaitObjectID(xid.New())
 	done := make(chan struct{})
-	// wog.chMap[id] = WaitObject{done, nil}
+
+	wog.mu.Lock()
+	if wog.chMap == nil {
+		wog.chMap = make(map[WaitObjectID](WaitObject))
+	}
 	wog.chMap[id] = WaitObject{done}
+	wog.mu.Unlock()
 
 	go func() {
 		defer func() {
 			close(done)
+			wog.mu.Lock()
 			delete(wog.chMap, id)
+			wog.mu.Unlock()
 			if wog.cancel != nil {
 				if p := recover(); p != nil {
 					fmt.Printf("panic was caused: %v\n", p)
