@@ -1,4 +1,4 @@
-module github.com/n-hizume/go-wait-object-group
+module github.com/n-hizume/waitobjectgroup
 
 go 1.20
 
