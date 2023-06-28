@@ -16,22 +16,22 @@ go install github.com/n-hizume/waitobjectgroup
 import "github.com/n-hizume/waitobjectgroup"
 
 func main() {
-	var wog waitobjectgroup.WaitObjectGroup
+    var wog waitobjectgroup.WaitObjectGroup
 
-	hoge1 := wog.Go(func(){...})
-	hoge2 := wog.Go(func(){...})
-	hoge3 := wog.Go(func(){...})
-	hoge4 := wog.Go(func(){...})
-	hoge5 := wog.Go(func(){...})
+    hoge1 := wog.Go(func(){...})
+    hoge2 := wog.Go(func(){...})
+    hoge3 := wog.Go(func(){...})
+    hoge4 := wog.Go(func(){...})
+    hoge5 := wog.Go(func(){...})
 
-	wog.Wait(hoge1)
-	fmt.Println("Wait1 Finished")
+    wog.Wait(hoge1)
+    fmt.Println("Wait1 Finished")
 
-	wog.Wait(hoge2, hoge4)
-	fmt.Println("Wait2&4 Finished")
+    wog.Wait(hoge2, hoge4)
+    fmt.Println("Wait2&4 Finished")
 
-	wog.WaitAll()
-	fmt.Println("WaitAll Finished")
+    wog.WaitAll()
+    fmt.Println("WaitAll Finished")
 }
 ```
 
@@ -50,23 +50,23 @@ func main() {
 
 ```
 func main() {
-	wog, ctx := waitobjectgroup.CreateGroup(context.TODO())
+    wog, ctx := waitobjectgroup.CreateGroup(context.TODO())
 
-	wog.Go(func() {
-		for {
-			select {
-			case <-ctx.Done():
-				fmt.Println("context Cancel")
-				return
-			case <-time.After(100 * time.Millisecond):
-				fmt.Println("Wait...")
-			}
-		}
-	})
+    wog.Go(func() {
+        for {
+            select {
+                case <-ctx.Done():
+		    fmt.Println("context Cancel")
+		    return
+		case <-time.After(100 * time.Millisecond):
+		    fmt.Println("Wait...")
+	    }
+	}
+    })
 
-	wog.Go(func(){ panic("hogePanic") })
+    wog.Go(func(){ panic("hogePanic") })
 
-	wog.WaitAll()
+    wog.WaitAll()
 }
 ```
 
@@ -80,11 +80,11 @@ func main() {
 
 ```
 func main() {
-	wog, _ := CreateGroup(context.TODO())
+    wog, _ := CreateGroup(context.TODO())
 
-	go wog.Go(func(){...})
+    go wog.Go(func(){...})
     go wog.Go(func(){...})
 
-	wog.WaitAll()
+    wog.WaitAll()
 }
 ```
