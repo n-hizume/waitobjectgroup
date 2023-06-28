@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/n-hizume/go_new_wait_group/waitobjectgroup"
+	"github.com/n-hizume/go-wait-object-group/waitobjectgroup"
 )
 
 func main() {
