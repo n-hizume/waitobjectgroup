@@ -3,6 +3,11 @@
 「Enablement Internship for Gophers 」
 で開発した、Goの並行処理を使ったOSSを開発するという課題の成果物です。
 
+# 概要
+`sync.waitGroup`や`errorGroup`のような、ゴルーチンの終了の待ち合わせをしたい時に使えます。
+
+実行開始時に返り値としてオブジェクトを受け取り、そのオブジェクトをWait関数の引数に渡すことで、渡したオブジェクトに対応するゴルーチン処理全てが終了するのを待機することができます。
+
 # 使用方法
 ```
 go install github.com/n-hizume/waitobjectgroup
