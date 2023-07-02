@@ -3,19 +3,19 @@
 「Enablement Internship for Gophers 」
 で開発した、Goの並行処理を使ったOSSを開発するという課題の成果物です。
 
-# 概要
+## 概要
 `sync.waitGroup`や`errorGroup`のような、ゴルーチンの終了の待ち合わせをしたい時に使えます。
 
 実行開始時に返り値としてオブジェクトを受け取り、そのオブジェクトをWait関数の引数に渡すことで、渡したオブジェクトに対応するゴルーチン処理全てが終了するのを待機することができます。
 
-# 使用方法
+## 使用方法
 ```
 go install github.com/n-hizume/waitobjectgroup
 ```
 を実行することで、このライブラリをinstallできます。
 
 
-## 使用例1
+### 使用例1
 
 ```
 import "github.com/n-hizume/waitobjectgroup"
@@ -46,7 +46,7 @@ func main() {
 
 また、`Go()`で実行した全ての処理を待ちたい場合は、`WaitAll()`関数を使うことができます。
 
-## 使用例2
+### 使用例2
 `errorGroup.WithCountext` のように、panicが起きた時にコンテキストをキャンセルすることもできます。
 
 下の例のように、`waitobjectgroup.CreateGroup(ctx)`として初期化してください。
@@ -75,7 +75,7 @@ func main() {
 }
 ```
 
-## 使用例3
+### 使用例3
 
 下の例のように、`Go()`関数自体をゴルーチン内で呼び出すこともできます。
 `WaitObjectGroup`の内部情報が適切に排他制御されているためです。
